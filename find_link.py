@@ -2,9 +2,13 @@ import openai
 from urllib.parse import urlparse
 import re
 import requests
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 # Setează cheia ta OpenAI
-openai.api_key = ""
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 def get_user_location():
     try:
