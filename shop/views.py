@@ -240,7 +240,7 @@ def create_checkout_session(request):
                 'currency': 'usd',
                 'product_data': {
                     'name': item.product.name,
-                    'description': item.product.description[:500] if item.product.description else '',
+                    'description': item.product.description[:500] if item.product.description else 'Product',
                 },
                 'unit_amount': int(item.product.price * 100),  # Stripe uses cents
             },
