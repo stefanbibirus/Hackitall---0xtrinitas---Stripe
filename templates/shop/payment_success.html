@@ -1,0 +1,125 @@
+<!-- FILE PATH: templates/shop/payment_success.html
+================================================================================ -->
+
+{% extends 'base.html' %}
+
+{% block title %}Payment Successful{% endblock %}
+
+{% block extra_css %}
+<style>
+    .success-container {
+        max-width: 600px;
+        margin: 100px auto;
+        padding: 0 40px;
+        text-align: center;
+    }
+
+    .success-icon {
+        width: 120px;
+        height: 120px;
+        background: linear-gradient(135deg, #57ffbd 0%, #00b894 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 30px;
+        animation: scaleIn 0.5s ease;
+    }
+
+    .success-icon svg {
+        width: 60px;
+        height: 60px;
+        stroke: white;
+        stroke-width: 3;
+    }
+
+    .success-title {
+        color: white;
+        font-size: 2.5rem;
+        margin-bottom: 20px;
+    }
+
+    .success-message {
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 1.2rem;
+        line-height: 1.6;
+        margin-bottom: 40px;
+    }
+
+    .success-actions {
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .success-btn {
+        padding: 15px 40px;
+        border-radius: 30px;
+        text-decoration: none;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+    }
+
+    .success-btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    .success-btn-secondary {
+        background: rgba(255, 255, 255, 0.15);
+        color: white;
+        backdrop-filter: blur(10px);
+    }
+
+    .success-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    @keyframes scaleIn {
+        from {
+            transform: scale(0);
+            opacity: 0;
+        }
+        to {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .success-container {
+            margin: 50px auto;
+            padding: 0 20px;
+        }
+
+        .success-title {
+            font-size: 2rem;
+        }
+
+        .success-actions {
+            flex-direction: column;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="success-container">
+    <div class="success-icon">
+        <svg viewBox="0 0 24 24" fill="none">
+            <path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+    </div>
+    <h1 class="success-title">Payment Successful!</h1>
+    <p class="success-message">
+        Thank you for your purchase! Your order has been placed successfully. 
+        You will receive a confirmation email shortly.
+    </p>
+    <div class="success-actions">
+        <a href="{% url 'orders' %}" class="success-btn success-btn-primary">View Orders</a>
+        <a href="{% url 'index' %}" class="success-btn success-btn-secondary">Continue Shopping</a>
+    </div>
+</div>
+{% endblock %}

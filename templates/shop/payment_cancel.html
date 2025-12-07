@@ -1,0 +1,125 @@
+<!-- FILE PATH: templates/shop/payment_cancel.html
+================================================================================ -->
+
+{% extends 'base.html' %}
+
+{% block title %}Payment Cancelled{% endblock %}
+
+{% block extra_css %}
+<style>
+    .cancel-container {
+        max-width: 600px;
+        margin: 100px auto;
+        padding: 0 40px;
+        text-align: center;
+    }
+
+    .cancel-icon {
+        width: 120px;
+        height: 120px;
+        background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 30px;
+        animation: scaleIn 0.5s ease;
+    }
+
+    .cancel-icon svg {
+        width: 60px;
+        height: 60px;
+        stroke: #333;
+        stroke-width: 3;
+    }
+
+    .cancel-title {
+        color: white;
+        font-size: 2.5rem;
+        margin-bottom: 20px;
+    }
+
+    .cancel-message {
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 1.2rem;
+        line-height: 1.6;
+        margin-bottom: 40px;
+    }
+
+    .cancel-actions {
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .cancel-btn {
+        padding: 15px 40px;
+        border-radius: 30px;
+        text-decoration: none;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+    }
+
+    .cancel-btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    .cancel-btn-secondary {
+        background: rgba(255, 255, 255, 0.15);
+        color: white;
+        backdrop-filter: blur(10px);
+    }
+
+    .cancel-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    @keyframes scaleIn {
+        from {
+            transform: scale(0);
+            opacity: 0;
+        }
+        to {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .cancel-container {
+            margin: 50px auto;
+            padding: 0 20px;
+        }
+
+        .cancel-title {
+            font-size: 2rem;
+        }
+
+        .cancel-actions {
+            flex-direction: column;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="cancel-container">
+    <div class="cancel-icon">
+        <svg viewBox="0 0 24 24" fill="none">
+            <path d="M18 6L6 18M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+    </div>
+    <h1 class="cancel-title">Payment Cancelled</h1>
+    <p class="cancel-message">
+        Your payment was cancelled. Your cart items are still saved. 
+        You can try again whenever you're ready.
+    </p>
+    <div class="cancel-actions">
+        <a href="{% url 'cart' %}" class="cancel-btn cancel-btn-primary">Return to Cart</a>
+        <a href="{% url 'index' %}" class="cancel-btn cancel-btn-secondary">Continue Shopping</a>
+    </div>
+</div>
+{% endblock %}
