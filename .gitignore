@@ -1,0 +1,9 @@
+proiect/_pycache__/
+venv/
+*.pyc
+proiect/env/
+env/
+db.sqlite3
+.env
+
+.env

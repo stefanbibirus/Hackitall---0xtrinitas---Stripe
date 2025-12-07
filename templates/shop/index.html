@@ -1,0 +1,746 @@
+<!-- FILE PATH: templates/shop/index.html
+================================================================================ -->
+
+{% extends 'base.html' %}
+
+{% block title %}Search Products{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Override header for index page */
+    .header {
+        position: relative;
+    }
+
+    /* Search container - centered initially */
+    .search-container {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: 80%;
+        max-width: 900px;
+        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 100;
+    }
+
+    .search-container.top {
+        position: fixed;
+        top: 100px;
+        transform: translateX(-50%);
+        background: white;
+        padding: 30px;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    }
+
+    h1 {
+        color: white;
+        font-size: 4rem;
+        text-align: center;
+        margin-bottom: 40px;
+        font-weight: 300;
+        letter-spacing: 2px;
+        transition: all 0.5s ease;
+        opacity: 1;
+    }
+
+    .search-container.top h1 {
+        display: none;
+    }
+
+    /* Search box wrapper */
+    .search-wrapper {
+        position: relative;
+        width: 100%;
+    }
+
+    .search-box {
+        width: 100%;
+        padding: 20px 60px 20px 30px;
+        font-size: 1.2rem;
+        border: none;
+        border-radius: 50px;
+        outline: none;
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        color: white;
+        font-family: 'Quintessential', serif;
+        transition: all 0.3s ease;
+    }
+
+    .search-container.top .search-box {
+        background: #f5f5f5;
+        color: #333;
+    }
+
+    .search-box::placeholder {
+        color: rgba(255, 255, 255, 0.7);
+    }
+
+    .search-container.top .search-box::placeholder {
+        color: rgba(0, 0, 0, 0.5);
+    }
+
+    .search-box:focus {
+        background: rgba(255, 255, 255, 0.25);
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+    }
+
+    .search-container.top .search-box:focus {
+        background: #e8e8e8;
+    }
+
+    .search-icon {
+        position: absolute;
+        right: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        background: none;
+        border: none;
+        padding: 5px;
+    }
+
+    .search-icon svg {
+        width: 28px;
+        height: 28px;
+        fill: white;
+        transition: fill 0.3s ease;
+    }
+
+    .search-container.top .search-icon svg {
+        fill: #667eea;
+    }
+
+    .filters-section {
+        margin-top: 20px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    .filters-btn {
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: none;
+        padding: 12px 30px;
+        border-radius: 30px;
+        color: white;
+        font-size: 1rem;
+        font-family: 'Quintessential', serif;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        transition: all 0.3s ease;
+    }
+
+    .search-container.top .filters-btn {
+        background: #f5f5f5;
+        color: #667eea;
+    }
+
+    .filters-btn:hover {
+        background: rgba(255, 255, 255, 0.25);
+    }
+
+    .search-container.top .filters-btn:hover {
+        background: #e8e8e8;
+    }
+
+    .filters-btn.hidden {
+        display: none;
+    }
+
+    .filter-input-container {
+        display: none;
+    }
+
+    .filter-input-container.show {
+        display: block;
+    }
+
+    .filter-input {
+        padding: 12px 20px;
+        border-radius: 30px;
+        border: none;
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        color: white;
+        font-size: 1rem;
+        font-family: 'Quintessential', serif;
+        outline: none;
+        min-width: 200px;
+        transition: all 0.3s ease;
+    }
+
+    .search-container.top .filter-input {
+        background: #f5f5f5;
+        color: #333;
+    }
+
+    .filter-input::placeholder {
+        color: rgba(255, 255, 255, 0.7);
+    }
+
+    .search-container.top .filter-input::placeholder {
+        color: rgba(0, 0, 0, 0.5);
+    }
+
+    .filter-bubble {
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: none;
+        padding: 12px 20px;
+        padding-right: 45px;
+        border-radius: 30px;
+        color: white;
+        font-size: 1rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        position: relative;
+        animation: bubbleIn 0.3s ease;
+    }
+
+    .search-container.top .filter-bubble {
+        background: #e8e8f7;
+        color: #667eea;
+    }
+
+    .filter-bubble .remove-btn {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(255, 255, 255, 0.3);
+        border: none;
+        border-radius: 50%;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        color: white;
+        font-size: 1rem;
+        transition: all 0.2s ease;
+    }
+
+    .search-container.top .filter-bubble .remove-btn {
+        background: #667eea;
+        color: white;
+    }
+
+    /* Loading spinner */
+    .loading {
+        display: none;
+        text-align: center;
+        padding: 40px;
+        color: white;
+    }
+
+    .loading.show {
+        display: block;
+    }
+
+    .spinner {
+        width: 50px;
+        height: 50px;
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        border-top-color: white;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 20px;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    /* Floating Plus Button */
+    .floating-plus {
+        position: fixed;
+        bottom: 40px;
+        right: 40px;
+        width: 70px;
+        height: 70px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 50%;
+        border: none;
+        cursor: pointer;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        transition: all 0.3s ease;
+        z-index: 1000;
+    }
+
+    .floating-plus.show {
+        display: flex;
+    }
+
+    .floating-plus:hover {
+        transform: scale(1.1);
+        box-shadow: 0 15px 40px rgba(102, 126, 234, 0.6);
+    }
+
+    .floating-plus svg {
+        width: 35px;
+        height: 35px;
+        fill: white;
+    }
+
+    /* Products grid */
+    .products-container {
+        display: none;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 250px 40px 40px 40px;
+        position: relative;
+        z-index: 10;
+    }
+
+    .products-container.show {
+        display: block;
+    }
+
+    .products-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 30px;
+        margin-top: 20px;
+    }
+
+    .product-card {
+        background: white;
+        border-radius: 15px;
+        padding: 20px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        animation: fadeIn 0.5s ease;
+    }
+
+    .product-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .product-image {
+        width: 100%;
+        height: 200px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.2rem;
+        margin-bottom: 15px;
+        overflow: hidden;
+    }
+
+    .product-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .product-title {
+        font-size: 1.2rem;
+        margin-bottom: 10px;
+        color: #333;
+    }
+
+    .product-price {
+        font-size: 1.5rem;
+        color: #667eea;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+
+    .product-description {
+        color: #666;
+        font-size: 0.9rem;
+        line-height: 1.5;
+        margin-bottom: 15px;
+    }
+
+    .add-to-cart-btn {
+        width: 100%;
+        padding: 12px 20px;
+        border: none;
+        border-radius: 30px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        font-size: 1rem;
+        font-family: 'Quintessential', serif;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .add-to-cart-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .add-to-cart-btn:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+    }
+
+    .add-to-cart-btn.added {
+        background: linear-gradient(135deg, #57ffbd 0%, #00b894 100%);
+    }
+
+    /* Error message */
+    .error-message {
+        text-align: center;
+        color: #ff6b6b;
+        padding: 20px;
+        font-size: 1.2rem;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes bubbleIn {
+        from {
+            opacity: 0;
+            transform: scale(0.8);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    @keyframes bubbleOut {
+        from {
+            opacity: 1;
+            transform: scale(1);
+        }
+        to {
+            opacity: 0;
+            transform: scale(0.8);
+        }
+    }
+
+    @media (max-width: 968px) {
+        .products-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 640px) {
+        .products-grid {
+            grid-template-columns: 1fr;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+        }
+
+        .search-container {
+            width: 90%;
+        }
+
+        .products-container {
+            padding: 200px 20px 40px 20px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Search Section -->
+<div class="search-container" id="searchContainer">
+    <h1 id="welcomeText">Welcome back!</h1>
+    <div class="search-wrapper">
+        <input type="text" class="search-box" id="searchBox" placeholder="What do you want to search">
+        <button class="search-icon" id="searchIcon" type="button">
+            <svg viewBox="0 0 24 24" fill="white">
+                <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2" fill="none"/>
+                <path d="M21 21l-4.35-4.35" stroke="currentColor" stroke-width="2" fill="none"/>
+            </svg>
+        </button>
+    </div>
+    <div class="filters-section">
+        <button class="filters-btn" id="filtersBtn" type="button">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/>
+            </svg>
+            Filters
+        </button>
+        <div class="filter-input-container" id="filterInputContainer">
+            <input type="text" class="filter-input" id="filterInput" placeholder="Add filter...">
+        </div>
+        <div id="filterBubbles"></div>
+    </div>
+</div>
+
+<!-- Loading -->
+<div class="loading" id="loading">
+    <div class="spinner"></div>
+    <p>Searching for products...</p>
+</div>
+
+<!-- Products Container -->
+<div class="products-container" id="productsContainer">
+    <div class="products-grid" id="productsGrid">
+        <!-- Products will be added here dynamically -->
+    </div>
+</div>
+
+<!-- Floating Plus Button -->
+<button class="floating-plus" id="floatingPlus" type="button">
+    <svg viewBox="0 0 24 24">
+        <path d="M12 5v14m-7-7h14" stroke="white" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+</button>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const searchBox = document.getElementById('searchBox');
+    const searchIcon = document.getElementById('searchIcon');
+    const searchContainer = document.getElementById('searchContainer');
+    const productsContainer = document.getElementById('productsContainer');
+    const productsGrid = document.getElementById('productsGrid');
+    const filtersBtn = document.getElementById('filtersBtn');
+    const filterInputContainer = document.getElementById('filterInputContainer');
+    const filterInput = document.getElementById('filterInput');
+    const filterBubbles = document.getElementById('filterBubbles');
+    const floatingPlus = document.getElementById('floatingPlus');
+    const welcomeText = document.getElementById('welcomeText');
+    const loading = document.getElementById('loading');
+
+    let filters = [];
+    let isSearchActive = false;
+    const isAuthenticated = "{{ user.is_authenticated|yesno:'true,false' }}" === "true";
+
+    // Welcome messages
+    const welcomeMessages = [
+        "Welcome back!",
+        "Hello again!",
+        "Great to see you!",
+        "Ready to explore?",
+        "Let's find something!",
+        "What are you looking for?",
+        "Happy shopping!",
+        "Discover something new!",
+        "Time to browse!",
+        "Welcome aboard!"
+    ];
+
+    // Set random welcome message on page load
+    function setRandomWelcomeMessage() {
+        const randomIndex = Math.floor(Math.random() * welcomeMessages.length);
+        welcomeText.textContent = welcomeMessages[randomIndex];
+    }
+    setRandomWelcomeMessage();
+
+    // Show filter input when Filters button is clicked
+    filtersBtn.addEventListener('click', () => {
+        filtersBtn.classList.add('hidden');
+        filterInputContainer.classList.add('show');
+        filterInput.focus();
+    });
+
+    // Add filter bubble when Enter is pressed
+    filterInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            const filterText = filterInput.value.trim();
+            if (filterText) {
+                addFilterBubble(filterText);
+                filterInput.value = '';
+            }
+        }
+    });
+
+    function addFilterBubble(text) {
+        filters.push(text);
+        
+        const bubble = document.createElement('div');
+        bubble.className = 'filter-bubble';
+        bubble.innerHTML = `
+            ${text}
+            <button class="remove-btn" onclick="removeFilterBubble(this, '${text}')">&times;</button>
+        `;
+        filterBubbles.appendChild(bubble);
+    }
+
+    window.removeFilterBubble = function(btn, text) {
+        const bubble = btn.parentElement;
+        bubble.style.animation = 'bubbleOut 0.3s ease';
+        
+        setTimeout(() => {
+            bubble.remove();
+            filters = filters.filter(f => f !== text);
+        }, 300);
+    };
+
+    async function performSearch() {
+        const searchTerm = searchBox.value.trim();
+        
+        if (!searchTerm) return;
+        
+        isSearchActive = true;
+        
+        // Hide filters and show loading
+        filtersBtn.classList.add('hidden');
+        filterInputContainer.classList.remove('show');
+        searchContainer.classList.add('top');
+        loading.classList.add('show');
+        productsContainer.classList.remove('show');
+        floatingPlus.classList.remove('show');
+        
+        try {
+            const filterString = filters.join(',');
+            const response = await fetch(`/search/?q=${encodeURIComponent(searchTerm)}&filters=${encodeURIComponent(filterString)}`);
+            const data = await response.json();
+            
+            loading.classList.remove('show');
+            productsContainer.classList.add('show');
+            floatingPlus.classList.add('show');
+            
+            productsGrid.innerHTML = '';
+            
+            if (data.error) {
+                productsGrid.innerHTML = `<div class="error-message">${data.error}</div>`;
+                return;
+            }
+            
+            if (data.products.length === 0) {
+                productsGrid.innerHTML = '<div class="error-message">No products found. Try a different search.</div>';
+                return;
+            }
+            
+            data.products.forEach((product, index) => {
+                const productCard = document.createElement('div');
+                productCard.className = 'product-card';
+                productCard.style.animationDelay = `${index * 0.1}s`;
+                
+                const imageHtml = product.image_url 
+                    ? `<img src="${product.image_url}" alt="${product.name}" onerror="this.parentElement.innerHTML='Product Image'">`
+                    : 'Product Image';
+                
+                productCard.innerHTML = `
+                    <div class="product-image">${imageHtml}</div>
+                    <div class="product-title">${product.name}</div>
+                    <div class="product-price">$${parseFloat(product.price).toFixed(2)}</div>
+                    <div class="product-description">${product.description || ''}</div>
+                    <button class="add-to-cart-btn" onclick="addToCart(${product.id}, this)" ${!isAuthenticated ? 'title="Please login to add items to cart"' : ''}>
+                        ${isAuthenticated ? 'Add to Cart' : 'Login to Add'}
+                    </button>
+                `;
+                productsGrid.appendChild(productCard);
+            });
+            
+        } catch (error) {
+            loading.classList.remove('show');
+            productsContainer.classList.add('show');
+            productsGrid.innerHTML = `<div class="error-message">Error: ${error.message}</div>`;
+        }
+    }
+
+    async function addToCart(productId, button) {
+        if (!isAuthenticated) {
+            window.location.href = '/login/?next=/';
+            return;
+        }
+        
+        button.disabled = true;
+        button.textContent = 'Adding...';
+        
+        try {
+            const response = await fetch(`/cart/add/${productId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrftoken,
+                    'Content-Type': 'application/json',
+                },
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                button.classList.add('added');
+                button.textContent = 'Added!';
+                
+                // Update cart badge
+                let badge = document.getElementById('cartBadge');
+                if (badge) {
+                    badge.textContent = data.cart_count;
+                } else {
+                    const cartIcon = document.querySelector('.header-icon');
+                    if (cartIcon) {
+                        const newBadge = document.createElement('span');
+                        newBadge.className = 'cart-badge';
+                        newBadge.id = 'cartBadge';
+                        newBadge.textContent = data.cart_count;
+                        cartIcon.appendChild(newBadge);
+                    }
+                }
+                
+                setTimeout(() => {
+                    button.classList.remove('added');
+                    button.textContent = 'Add to Cart';
+                    button.disabled = false;
+                }, 2000);
+            } else {
+                button.textContent = 'Error';
+                setTimeout(() => {
+                    button.textContent = 'Add to Cart';
+                    button.disabled = false;
+                }, 2000);
+            }
+        } catch (error) {
+            button.textContent = 'Error';
+            setTimeout(() => {
+                button.textContent = 'Add to Cart';
+                button.disabled = false;
+            }, 2000);
+        }
+    }
+
+    // Reset to search page
+    floatingPlus.addEventListener('click', () => {
+        isSearchActive = false;
+        searchContainer.classList.remove('top');
+        productsContainer.classList.remove('show');
+        floatingPlus.classList.remove('show');
+        filtersBtn.classList.remove('hidden');
+        filterInputContainer.classList.remove('show');
+        searchBox.value = '';
+        filterBubbles.innerHTML = '';
+        filters = [];
+        setRandomWelcomeMessage();
+    });
+
+    // Search on Enter key
+    searchBox.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            performSearch();
+        }
+    });
+
+    // Search on icon click
+    searchIcon.addEventListener('click', performSearch);
+</script>
+{% endblock %}
