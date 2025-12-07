@@ -4,8 +4,13 @@ import os
 import time
 import random
 from openai import OpenAI
+from dotenv import load_dotenv
+import os
 
-client = OpenAI(api_key="")  # pune cheia ta
+load_dotenv()
+
+# Setează cheia ta OpenAI
+openai.api_key = os.getenv("OPENAI_API_KEY")
 CACHE_FILE = "CUI_cache.json"
 
 # Încarcă cache

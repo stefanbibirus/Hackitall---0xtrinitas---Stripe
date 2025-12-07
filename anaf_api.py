@@ -9,19 +9,19 @@ LISTAFIRME_BASE_URL = "https://listafirme.ro"
 
 def normalize_name(name):
     """
-    Curăță denumirea firmei:
-    - Elimină punctele
-    - Elimină "SC" dacă e primul cuvânt
-    - Transformă în lowercase și înlocuiește spațiile cu cratime
-    - Elimină caractere speciale (doar litere, cifre și cratime)
+    Curața denumirea firmei:
+    - Elimina punctele
+    - Elimina "SC" daca e primul cuvânt
+    - Transforma în lowercase și înlocuiește spațiile cu cratime
+    - Elimina caractere speciale (doar litere, cifre și cratime)
     """
-    # Elimină punctele
+    # Elimina punctele
     name = name.replace(".", "")
     
     # Împarte în cuvinte
     words = name.strip().split()
     
-    # Dacă primul cuvânt e 'SC', îl eliminăm
+    # Daca primul cuvânt e 'SC', îl eliminam
     if words and words[0].lower() == "sc":
         words = words[1:]
     
@@ -32,7 +32,7 @@ def normalize_name(name):
 
 def get_cui(nume_vector):
     """
-    Primește un vector de denumiri de firme și returnează vector de ID-uri numeric.
+    Primește un vector de denumiri de firme și returneaza vector de ID-uri numeric.
     """
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
@@ -55,7 +55,7 @@ def get_cui(nume_vector):
             else:
                 ids.append(None)
             
-            # Pauză mică ca să nu lovești site-ul prea tare
+            # Pauza mica ca sa nu lovești site-ul prea tare
             time.sleep(0.5)
         except requests.exceptions.RequestException as e:
             print(f"Eroare la firma {nume_firma}: {e}")
@@ -65,7 +65,7 @@ def get_cui(nume_vector):
 
 def get_companies_info(cui_vector):
     """
-    Interroghează ANAF pentru un vector de CUI-uri și returnează datele în matrice.
+    Interrogheaza ANAF pentru un vector de CUI-uri și returneaza datele în matrice.
     
     Args:
         cui_vector: Lista de CUI-uri
@@ -78,7 +78,7 @@ def get_companies_info(cui_vector):
     data = datetime.now().strftime("%Y-%m-%d")
     headers = {"Content-Type": "application/json"}
     
-    # Procesează câte 100 de CUI-uri odată (limita ANAF)
+    # Proceseaza câte 100 de CUI-uri odata (limita ANAF)
     for i in range(0, len(cui_vector), 100):
         batch = cui_vector[i:i+100]
         payload = [{"cui": cui, "data": data} for cui in batch]
@@ -97,7 +97,7 @@ def get_companies_info(cui_vector):
                 
                 date_companii.append([cui_gasit, localitate, judet])
         
-        # Respectă limita de 1 request/secundă
+        # Respecta limita de 1 request/secunda
         if i + 100 < len(cui_vector):
             time.sleep(1)
     
@@ -106,7 +106,7 @@ def get_companies_info(cui_vector):
 
 def get_financial_info(cui_vector):
     """
-    Interroghează ANAF pentru cifra de afaceri și numărul de angajați din ultimul an fiscal.
+    Interrogheaza ANAF pentru cifra de afaceri și numarul de angajați din ultimul an fiscal.
     
     Args:
         cui_vector: Lista de CUI-uri
@@ -130,15 +130,15 @@ def get_financial_info(cui_vector):
         cifra_afaceri = None
         numar_angajati = None
         
-        # Verifică dacă există date
+        # Verifica daca exista date
         if response.status_code == 200:
             result = response.json()
             
             if result.get("i"):
-                # Creează un dicționar pentru acces rapid la indicatori
+                # Creeaza un dicționar pentru acces rapid la indicatori
                 indicatori_map = {item["indicator"]: item["val_indicator"] for item in result["i"]}
                 
-                # Încearcă să extragi valorile folosind cheile indicatorilor
+                # Încearca sa extragi valorile folosind cheile indicatorilor
                 # I27: Venituri totale (Surogat CA pt. Asigurari)
                 cifra_afaceri = indicatori_map.get("I13") 
                 # I33: Numar mediu de salariati
